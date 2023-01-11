@@ -74,7 +74,8 @@ enum instruction_set {
   AVX512CD = 0x2000,
   AVX512BW = 0x4000,
   AVX512VL = 0x8000,
-  AVX512VBMI2 = 0x10000
+  AVX512VBMI2 = 0x10000,
+  SVE = 0x20000
 };
 
 #if defined(__PPC64__)
@@ -85,13 +86,19 @@ static inline uint32_t detect_supported_architectures() {
 
 #elif defined(__arm__) || defined(__aarch64__) // incl. armel, armhf, arm64
 
-#if defined(__ARM_NEON)
+#if defined(__ARM_FEATURE_SVE)
+
+static inline uint32_t detect_supported_architectures() {
+  return instruction_set::SVE;
+}
+
+#elif defined(__ARM_NEON)
 
 static inline uint32_t detect_supported_architectures() {
   return instruction_set::NEON;
 }
 
-#else // ARM without NEON
+#else // ARM without NEON or SVE
 
 static inline uint32_t detect_supported_architectures() {
   return instruction_set::DEFAULT;
